@@ -1,54 +1,23 @@
-import React, { useState, useEffect, createContext } from 'react';
+import React, { useEffect, createContext, useReducer, Dispatch } from 'react';
 
-import { fetchData } from '@/apis/fetchData';
-import {
-  API_KEY,
-  NUMBER_OF_ITEMS,
-  CONTENT_TYPE,
-  DEFAULT_SEARCH_VALUE,
-  DELAY,
-  MIN_SEARCH_CHARACTERS,
-  QUERY_TYPE,
-} from '@/constants/constantValues';
-import { ContextProps, AppContextInterface, IShow, IMovie } from '@/types/types';
+import getItems from '@/apis/getItems';
+import { NUMBER_OF_ITEMS, CONTENT_TYPE, DELAY, MIN_SEARCH_CHARACTERS, QUERY_TYPE } from '@/constants/constantValues';
+import initialState from '@/constants/initialState';
+import stateReducer from '@/helpers/stateReducer';
+import { ContentType, QueryType, ReducerAction } from '@/types/types';
 
-const MoviesShowsContext = createContext({} as AppContextInterface);
+import { IAppContext, Context } from './types';
+
+const MoviesShowsContext = createContext<IAppContext>(initialState);
+const MoviesShowsDispatchContext = createContext<Dispatch<ReducerAction>>(() => {});
 let timer: ReturnType<typeof setTimeout> | null = null;
 
-function MoviesShowsProvider({ children }: ContextProps) {
-  const [shows, setShows] = useState<IShow[]>([]);
-  const [movies, setMovies] = useState<IMovie[]>([]);
-  const [activeQueryType, setActiveQueryType] = useState<string>(QUERY_TYPE.TOP_RATED);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [contentType, setContentType] = useState<string>(CONTENT_TYPE.TV_SHOW);
-  const [search, setSearch] = useState<string>(DEFAULT_SEARCH_VALUE);
-
-  const QUERY_TYPE_INFO = {
-    [QUERY_TYPE.TOP_RATED]: `https://api.themoviedb.org/3/${contentType}/top_rated?api_key=${API_KEY}&language=en-US`,
-    [QUERY_TYPE.SEARCH]: `https://api.themoviedb.org/3/search/${contentType}?api_key=${API_KEY}&language=en-US&query=${search}`,
-  };
-
-  const getItems = (quryType: string) =>
-    fetchData(QUERY_TYPE_INFO[quryType])
-      .then(({ results }) => {
-        const items = quryType === QUERY_TYPE.TOP_RATED ? results.slice(0, NUMBER_OF_ITEMS) : results;
-
-        if (contentType === CONTENT_TYPE.TV_SHOW) {
-          setShows(items);
-        } else {
-          setMovies(items);
-        }
-      })
-      .catch(() => {
-        // TODO: Handle errors
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+function MoviesShowsProvider({ children }: Context) {
+  const [state, dispatch] = useReducer(stateReducer, initialState);
 
   useEffect(() => {
-    const queryType = search.length >= MIN_SEARCH_CHARACTERS ? QUERY_TYPE.SEARCH : QUERY_TYPE.TOP_RATED;
-    setActiveQueryType(queryType);
+    const queryType = state.search.length >= MIN_SEARCH_CHARACTERS ? QUERY_TYPE.SEARCH : QUERY_TYPE.TOP_RATED;
+    dispatch({ type: 'SET_ACTIVE_QUERY_TYPE', activeQueryType: queryType });
 
     // Prevent calling api in time scope of 1s
     if (timer) {
@@ -59,48 +28,54 @@ function MoviesShowsProvider({ children }: ContextProps) {
     // The search is performed only when there are 3 or more characters in the search bar
     // It should be triggered only one second after the user has stopped typing
     if (queryType === QUERY_TYPE.SEARCH) {
-      timer = setTimeout(
-        () =>
-          getItems(queryType).then(() => {
-            if (timer) {
-              clearTimeout(timer);
-              timer = null;
-            }
-          }),
-        DELAY,
-      );
+      timer = setTimeout(() => getItemsDataAndClearTimer(queryType), DELAY);
     } // Prevent getting top 10 items multiple times if there are 2 or less characters in the search bar
-    else if (queryType !== activeQueryType) {
-      getItems(queryType);
+    else if (queryType !== state.activeQueryType) {
+      getItemsData(queryType);
     }
-  }, [search, activeQueryType]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [state.search, state.activeQueryType]);
 
   // Triggered on switching between tabs
   useEffect(() => {
-    getItems(activeQueryType);
-  }, [contentType]); // eslint-disable-line react-hooks/exhaustive-deps
+    getItemsData(state.activeQueryType);
+  }, [state.contentType]);
+
+  const getItemsData = (queryType: string) =>
+    getItems(queryType as QueryType, state.contentType as ContentType, state.search)
+      .then(({ results }) => {
+        const items = queryType === QUERY_TYPE.TOP_RATED ? results.slice(0, NUMBER_OF_ITEMS) : results;
+
+        if (state.contentType === CONTENT_TYPE.TV_SHOW) {
+          dispatch({ type: 'SET_SHOWS', shows: items });
+        } else {
+          dispatch({ type: 'SET_MOVIES', movies: items });
+        }
+      })
+      .catch(() => {
+        // TODO: Handle errors
+      })
+      .finally(() => {
+        dispatch({ type: 'SET_LOADING', loading: false });
+      });
+
+  const getItemsDataAndClearTimer = (queryType: string) => {
+    getItemsData(queryType)
+      .then(() => {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      })
+      .catch(() => {
+        // TODO: Handle errors
+      });
+  };
 
   return (
-    <MoviesShowsContext.Provider
-      value={{
-        movies,
-        setMovies,
-        shows,
-        setShows,
-        activeQueryType,
-        loading,
-        setLoading,
-        contentType,
-        setContentType,
-        search,
-        setSearch,
-      }}
-    >
-      {children}
+    <MoviesShowsContext.Provider value={state}>
+      <MoviesShowsDispatchContext.Provider value={dispatch}>{children}</MoviesShowsDispatchContext.Provider>
     </MoviesShowsContext.Provider>
   );
 }
 
-const MoviesShowsConsumer = MoviesShowsContext.Consumer;
-
-export { MoviesShowsContext, MoviesShowsProvider, MoviesShowsConsumer };
+export { MoviesShowsContext, MoviesShowsDispatchContext, MoviesShowsProvider };

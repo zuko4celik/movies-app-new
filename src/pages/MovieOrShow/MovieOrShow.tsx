@@ -2,13 +2,13 @@ import React, { useState, useContext, useEffect } from 'react';
 
 import { Link, useParams } from 'react-router-dom';
 
-import { fetchData } from '@/apis/fetchData';
+import getItem from '@/apis/getItem';
 import Loading from '@/components/Loading/Loading';
 import Vote from '@/components/Vote/Vote';
-import { API_KEY, IMAGE_PATH, DEFAULT_IMAGE } from '@/constants/constantValues';
+import { IMAGE_PATH, DEFAULT_IMAGE } from '@/constants/constantValues';
 import { MoviesShowsContext } from '@/context/Context';
 import calculateAverageVote from '@/helpers/calculateAverageVote';
-import { ItemType } from '@/types/types';
+import { ContentType, IItem } from '@/types/types';
 
 import './MovieOrShow.css';
 
@@ -16,11 +16,10 @@ export default function MovieOrShow() {
   const { contentType } = useContext(MoviesShowsContext);
   const { id } = useParams();
   const [video, setVideo] = useState<string | number>();
-  const [item, setItem] = useState<ItemType>();
-  const ITEM_URL = `https://api.themoviedb.org/3/${contentType}/${id}?api_key=${API_KEY}&append_to_response=videos`;
+  const [item, setItem] = useState<IItem>();
 
   useEffect(() => {
-    fetchData(ITEM_URL)
+    getItem(contentType as ContentType, id as string)
       .then((data) => {
         setItem(data);
         // Set video key to use in React Player url
@@ -29,7 +28,7 @@ export default function MovieOrShow() {
       .catch(() => {
         // TODO: Handle error
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Display loader if there is no item
   if (!item) {
@@ -41,7 +40,7 @@ export default function MovieOrShow() {
     item.videos.results.length === 0 ? (
       <img
         className='item-media picture'
-        src={item.poster_path ? `${IMAGE_PATH}${item.poster_path}` : DEFAULT_IMAGE}
+        src={item.posterPath ? `${IMAGE_PATH}${item.posterPath}` : DEFAULT_IMAGE}
         alt={item.title || item.name}
       />
     ) : (
@@ -58,13 +57,13 @@ export default function MovieOrShow() {
     <div>
       <h1 className='item-title'>
         {item.name || item.title}
-        {item.vote_average > 0 && <Vote voteValue={calculateAverageVote(item.vote_average)} />}
+        {item.voteAverage > 0 && <Vote value={calculateAverageVote(item.voteAverage)} />}
       </h1>
       <hr />
       <p className='item-release'>
-        {item.release_date
-          ? `Release Date: ${item.release_date}`
-          : `First Air Date: ${item.first_air_date} \nLast Air Date: ${item.last_air_date}`}
+        {item.releaseDate
+          ? `Release Date: ${item.releaseDate}`
+          : `First Air Date: ${item.firstAirDate} \nLast Air Date: ${item.lastAirDate}`}
       </p>
       <p className='item-overview'>
         {item.overview.length > 0 ? item.overview : 'No additional information available.'}

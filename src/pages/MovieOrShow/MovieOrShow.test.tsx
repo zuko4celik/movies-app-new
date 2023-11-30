@@ -2,17 +2,17 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react';
 
-import { fetchData } from '@/apis/fetchData';
+import getItem from '@/apis/getItem';
 
 import MovieOrShow from './MovieOrShow';
 
-jest.mock('@/apis/fetchData');
+jest.mock('@/apis/getItem');
 
 describe('MovieOrShow component', () => {
   beforeEach(() => jest.clearAllMocks());
 
   test('should render movie or show item when api responds', async () => {
-    (fetchData as jest.Mock).mockResolvedValue({
+    (getItem as jest.Mock).mockResolvedValue({
       results: [{ name: 'spiderman' }],
     });
     render(<MovieOrShow />);

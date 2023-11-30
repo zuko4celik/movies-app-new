@@ -2,17 +2,17 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react';
 
-import { fetchData } from '@/apis/fetchData';
+import getItems from '@/apis/getItems';
 
 import App from './App';
 
-jest.mock('@/apis/fetchData');
+jest.mock('@/apis/getItems');
 
 describe('App component', () => {
   beforeEach(() => jest.clearAllMocks());
 
   test('should render image alt content', async () => {
-    (fetchData as jest.Mock).mockResolvedValue({
+    (getItems as jest.Mock).mockResolvedValue({
       results: [{ name: 'spiderman' }],
     });
     render(<App />);

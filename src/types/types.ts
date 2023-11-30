@@ -1,47 +1,42 @@
-export type ContextProps = {
-  children: React.ReactNode;
-};
+import { CONTENT_TYPE, QUERY_TYPE } from '@/constants/constantValues';
 
 export interface IData {
   id: number;
   overview: string;
-  vote_average: number;
-  poster_path: string | null;
+  voteAverage: number;
+  posterPath: string | null;
 }
 
 export interface IShow extends IData {
   name: string;
-  first_air_date: string;
-  last_air_date: string;
+  firstAirDate: string;
+  lastAirDate: string;
 }
 
 interface IVideos {
-  results: Array<object>;
+  results: Array<{ key: string }>;
 }
 
 export interface IMovie extends IData {
   title: string;
   videos: IVideos;
-  release_date: string;
+  releaseDate: string;
 }
 
-export type AppContextInterface = {
-  movies: IMovie[];
-  setMovies: (value: IMovie[]) => void;
-  shows: IShow[];
-  setShows: (value: IShow[]) => void;
-  activeQueryType: string;
-  loading: boolean;
-  setLoading: (value: boolean) => void;
-  contentType: string;
-  setContentType: (value: string) => void;
-  search: string;
-  setSearch: (value: string) => void;
-};
+export type ReducerAction =
+  | { type: 'SET_LOADING'; loading: boolean }
+  | { type: 'SET_CONTENT_TYPE' | 'SET_ACTIVE_QUERY_TYPE' | 'SET_SEARCH'; [key: string]: string }
+  | { type: 'SET_SHOWS'; shows: IShow[] }
+  | { type: 'SET_MOVIES'; movies: IMovie[] };
 
-export type NavbarState = {
-  moviesActive: boolean;
-  showsActive: boolean;
-};
+export interface IItem extends IMovie, IShow {}
 
-export type ItemType = IMovie & IShow;
+export interface IItems {
+  results: IItem[];
+}
+
+type ValueOf<T> = T[keyof T];
+
+export type ContentType = ValueOf<typeof CONTENT_TYPE>;
+
+export type QueryType = ValueOf<typeof QUERY_TYPE>;
