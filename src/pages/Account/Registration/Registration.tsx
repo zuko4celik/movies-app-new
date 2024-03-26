@@ -5,9 +5,11 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import registerUser from '@/apis/registerUser';
-import { DELAY, ERROR_CODES, MESSAGES, STATUS_CODES } from '@/constants/constantValues';
+import Field from '@/components/Field';
+import { DELAY, ERROR_CODES, MESSAGES, REGISTRATION_FIELDS, STATUS_CODES } from '@/constants/constantValues';
 import { registrationSchema } from '@/helpers';
 
+import { IRegister } from './types';
 import '../Account.css';
 import type { IAccountInfo, IUser } from '../types';
 
@@ -57,73 +59,21 @@ export default function Registration(): JSX.Element {
         <fieldset>
           <h2>Registration</h2>
 
-          <div className='field'>
-            <label htmlFor='firstName'>First Name</label>
-            <input
-              id='firstName'
-              {...register('firstName')}
-              className={errors.firstName ? 'border-danger' : ''}
-              placeholder='First name'
-            ></input>
-          </div>
-
-          <div className='field'>
-            <label htmlFor='lastName'>Last Name</label>
-            <input
-              id='lastName'
-              {...register('lastName')}
-              className={errors.lastName ? 'border-danger' : ''}
-              placeholder='Last name'
-            ></input>
-          </div>
-
-          <div className='field'>
-            <label htmlFor='email'>
-              Email <sup>*</sup>
-            </label>
-            <input
-              id='email'
-              type='email'
-              {...register('email')}
-              className={errors.email ? 'border-danger' : ''}
-              placeholder='Email address'
-            ></input>
-            <p className='text-danger'>{errors.email?.message}</p>
-          </div>
-
-          <div className='field password-wrapper'>
-            <label htmlFor='password'>
-              Password <sup>*</sup>
-            </label>
-            <input
-              id='password'
-              type={showPassword ? 'text' : 'password'}
-              {...register('password')}
-              className={errors.password ? 'border-danger' : ''}
-              placeholder='Password'
-            ></input>
-            <i
-              className={showPassword ? 'fa fa-solid fa-eye' : 'fa fa-solid fa-eye-slash'}
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            ></i>
-            <p className='text-danger'>{errors.password?.message}</p>
-          </div>
-
-          <div className='field'>
-            <label htmlFor='confirmPassword'>
-              Confirm Password <sup>*</sup>
-            </label>
-            <input
-              id='confirmPassword'
-              type='password'
-              {...register('confirmPassword')}
-              className={errors.confirmPassword ? 'border-danger' : ''}
-              placeholder='Confirm Password'
-              autoComplete='false'
-            ></input>
-            <p className='text-danger'>{errors.confirmPassword?.message}</p>
-          </div>
+          {REGISTRATION_FIELDS.map((field) => (
+            <Field<IRegister>
+              key={field.id}
+              id={field.id}
+              type={field.type}
+              label={field.label}
+              placeholder={field.placeholder}
+              register={register}
+              isRequired={field.isRequired}
+              autoComplete={field.autoComplete}
+              errors={errors}
+              showPassword={showPassword}
+              setShowPassword={() => setShowPassword(!showPassword)}
+            ></Field>
+          ))}
 
           <button type='submit' disabled={isSubmitting}>
             Create account

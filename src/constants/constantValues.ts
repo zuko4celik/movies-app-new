@@ -41,3 +41,45 @@ export const MESSAGES = {
   RESET_PASSWORD_MESSAGE: 'Password is changed. Please login with the new password.',
   GENERAL_ERROR_MESSAGE: 'Something went wrong. Please try again.',
 };
+export const REGISTRATION_FIELDS = [
+  {
+    id: 'firstName',
+    type: 'text',
+    label: 'First Name',
+    placeholder: 'First name',
+    isRequired: false,
+    autoComplete: 'true',
+  },
+  {
+    id: 'lastName',
+    type: 'text',
+    label: 'Last Name',
+    placeholder: 'Last name',
+    isRequired: false,
+    autoComplete: 'true',
+  },
+  {
+    id: 'email',
+    type: 'email',
+    label: 'Email',
+    placeholder: 'Email address',
+    isRequired: true,
+    autoComplete: 'true',
+  },
+  {
+    id: 'password',
+    type: 'password',
+    label: 'Password',
+    placeholder: 'Password',
+    isRequired: true,
+    autoComplete: 'true',
+  },
+  {
+    id: 'confirmPassword',
+    type: 'password',
+    label: 'Confirm Password',
+    placeholder: 'Confirm password',
+    isRequired: true,
+    autoComplete: 'false',
+  },
+];
