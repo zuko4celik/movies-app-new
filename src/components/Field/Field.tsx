@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 
 import type { FieldErrors, FieldValues, Path, UseFormRegister } from 'react-hook-form';
 

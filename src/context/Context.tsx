@@ -1,5 +1,5 @@
 import React, { useEffect, createContext, useReducer } from 'react';
-import type { Dispatch } from 'react';
+import type { Dispatch, JSX } from 'react';
 
 import getItems from '@/apis/getItems';
 import { NUMBER_OF_ITEMS, CONTENT_TYPE, DELAY, MIN_SEARCH_CHARACTERS, QUERY_TYPE } from '@/constants/constantValues';
@@ -72,9 +72,9 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
       });
 
   return (
-    <MoviesShowsContext.Provider value={state}>
-      <MoviesShowsDispatchContext.Provider value={dispatch}>{children}</MoviesShowsDispatchContext.Provider>
-    </MoviesShowsContext.Provider>
+    <MoviesShowsContext value={state}>
+      <MoviesShowsDispatchContext value={dispatch}>{children}</MoviesShowsDispatchContext>
+    </MoviesShowsContext>
   );
 }
 
