@@ -72,9 +72,9 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
       });
 
   return (
-    <MoviesShowsContext value={state}>
-      <MoviesShowsDispatchContext value={dispatch}>{children}</MoviesShowsDispatchContext>
-    </MoviesShowsContext>
+    <MoviesShowsContext.Provider value={state}>
+      <MoviesShowsDispatchContext.Provider value={dispatch}>{children}</MoviesShowsDispatchContext.Provider>
+    </MoviesShowsContext.Provider>
   );
 }
 
