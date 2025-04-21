@@ -44,8 +44,10 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
     getItemsData(state.activeQueryType);
   }, [state.contentType]);
 
-  const getItemsData = (queryType: string): Promise<void> =>
-    getItems(queryType as QueryType, state.contentType as ContentType, state.search)
+  const getItemsData = (queryType: string): Promise<void> => {
+    dispatch({ type: 'SET_LOADING', loading: true });
+
+    return getItems(queryType as QueryType, state.contentType as ContentType, state.search)
       .then(({ results }) => {
         const items = queryType === QUERY_TYPE.TOP_RATED ? results.slice(0, NUMBER_OF_ITEMS) : results;
 
@@ -61,6 +63,7 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
       .finally(() => {
         dispatch({ type: 'SET_LOADING', loading: false });
       });
+  };
 
   const getItemsDataAndClearTimer = (queryType: string): Promise<void> =>
     getItemsData(queryType)
