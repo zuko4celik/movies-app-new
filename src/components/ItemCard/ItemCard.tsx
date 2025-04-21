@@ -1,4 +1,4 @@
-import React, { JSX, useContext } from 'react';
+import React, { JSX, use } from 'react';
 
 import { Link } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ import './ItemCard.css';
 import type { IItemCard } from './types';
 
 export default function ItemCard({ item }: IItemCard): JSX.Element {
-  const { contentType } = useContext(MoviesShowsContext);
+  const { contentType } = use(MoviesShowsContext);
   const { id, posterPath, title, name, voteAverage } = item;
 
   return (

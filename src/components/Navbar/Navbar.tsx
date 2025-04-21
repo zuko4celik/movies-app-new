@@ -1,17 +1,17 @@
-import React, { JSX, useContext, useState } from 'react';
+import React, { JSX, use, useState } from 'react';
 
 import { CONTENT_TYPE, SHOW_PLACEHOLDER, MOVIE_PLACEHOLDER } from '@/constants/constantValues';
-import { MoviesShowsDispatchContext, MoviesShowsContext } from '@/context';
+import { MoviesShowsContext, MoviesShowsDispatchContext } from '@/context';
 import useAuth from '@/hooks/useAuth';
 
 import './Navbar.css';
-import type { INavbar } from './types';
+import type { INavbarActiveType } from './types';
 
 export default function Navbar(): JSX.Element {
   const { handleLogout } = useAuth();
-  const { search, contentType } = useContext(MoviesShowsContext);
-  const dispatch = useContext(MoviesShowsDispatchContext);
-  const [state, setState] = useState<INavbar>({
+  const { search, contentType } = use(MoviesShowsContext);
+  const dispatch = use(MoviesShowsDispatchContext);
+  const [activeType, setActiveType] = useState<INavbarActiveType>({
     moviesActive: contentType === CONTENT_TYPE.MOVIE,
     showsActive: contentType === CONTENT_TYPE.TV_SHOW,
   });
@@ -24,9 +24,9 @@ export default function Navbar(): JSX.Element {
 
     // Check content type on button you clicked and set it to the opposite value
     if (contentType !== value) {
-      setState({
-        moviesActive: !state.moviesActive,
-        showsActive: !state.showsActive,
+      setActiveType({
+        moviesActive: !activeType.moviesActive,
+        showsActive: !activeType.showsActive,
       });
     }
   };
@@ -42,10 +42,18 @@ export default function Navbar(): JSX.Element {
   return (
     <div className='navbar-container'>
       <div className='navbar-buttons'>
-        <button className={setButtonClassName(state.showsActive)} value={CONTENT_TYPE.TV_SHOW} onClick={handleContent}>
+        <button
+          className={setButtonClassName(activeType.showsActive)}
+          value={CONTENT_TYPE.TV_SHOW}
+          onClick={handleContent}
+        >
           {`${SHOW_PLACEHOLDER}s`}
         </button>
-        <button className={setButtonClassName(state.moviesActive)} value={CONTENT_TYPE.MOVIE} onClick={handleContent}>
+        <button
+          className={setButtonClassName(activeType.moviesActive)}
+          value={CONTENT_TYPE.MOVIE}
+          onClick={handleContent}
+        >
           {`${MOVIE_PLACEHOLDER}s`}
         </button>
       </div>
