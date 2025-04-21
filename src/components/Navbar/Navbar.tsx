@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { JSX, useContext, useState } from 'react';
 
 import { CONTENT_TYPE, SHOW_PLACEHOLDER, MOVIE_PLACEHOLDER } from '@/constants/constantValues';
 import { MoviesShowsDispatchContext, MoviesShowsContext } from '@/context';

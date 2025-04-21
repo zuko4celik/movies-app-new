@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { JSX, useContext } from 'react';
 
 import { Link } from 'react-router-dom';
 

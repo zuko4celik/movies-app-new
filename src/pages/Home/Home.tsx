@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { JSX, useContext } from 'react';
 
 import ItemCard from '@/components/ItemCard';
 import Loading from '@/components/Loading';
