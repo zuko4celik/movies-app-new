@@ -1,4 +1,4 @@
-import React, { JSX, useContext } from 'react';
+import React, { JSX, use } from 'react';
 
 import ItemCard from '@/components/ItemCard';
 import Loading from '@/components/Loading';
@@ -11,18 +11,16 @@ import './Home.css';
 import type { IMovie, IShow } from './types';
 
 export default function Home(): JSX.Element {
-  const { movies, shows, contentType, loading } = useContext(MoviesShowsContext);
+  const { movies, shows, contentType, loading } = use(MoviesShowsContext);
   const data = contentType === CONTENT_TYPE.TV_SHOW ? (shows as IShow[]) : (movies as IMovie[]);
 
   // Display movies/tv shows as item cards
   const items = data.map((item) => <ItemCard key={item.id} item={item as IItem} />);
 
-  return loading ? (
-    <Loading />
-  ) : (
+  return (
     <>
       <Navbar />
-      <section className='grid-container'>{items}</section>
+      {loading ? <Loading /> : <section className='grid-container'>{items}</section>}
     </>
   );
 }

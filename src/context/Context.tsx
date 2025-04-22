@@ -1,6 +1,8 @@
 import React, { useEffect, createContext, useReducer } from 'react';
 import type { Dispatch, JSX } from 'react';
 
+import { useErrorBoundary } from 'react-error-boundary';
+
 import getItems from '@/apis/getItems';
 import { NUMBER_OF_ITEMS, CONTENT_TYPE, DELAY, MIN_SEARCH_CHARACTERS, QUERY_TYPE } from '@/constants/constantValues';
 import { stateReducer } from '@/helpers';
@@ -15,6 +17,7 @@ let timer: ReturnType<typeof setTimeout> | null = null;
 
 function MoviesShowsProvider({ children }: Context): JSX.Element {
   const [state, dispatch] = useReducer(stateReducer, initialState);
+  const { showBoundary } = useErrorBoundary();
 
   useEffect(() => {
     const queryType = state.search.length >= MIN_SEARCH_CHARACTERS ? QUERY_TYPE.SEARCH : QUERY_TYPE.TOP_RATED;
@@ -41,9 +44,11 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
     getItemsData(state.activeQueryType);
   }, [state.contentType]);
 
-  const getItemsData = (queryType: string): Promise<void> =>
-    getItems(queryType as QueryType, state.contentType as ContentType, state.search)
-      .then(({ data: { results } }) => {
+  const getItemsData = (queryType: string): Promise<void> => {
+    dispatch({ type: 'SET_LOADING', loading: true });
+
+    return getItems(queryType as QueryType, state.contentType as ContentType, state.search)
+      .then(({ results }) => {
         const items = queryType === QUERY_TYPE.TOP_RATED ? results.slice(0, NUMBER_OF_ITEMS) : results;
 
         if (state.contentType === CONTENT_TYPE.TV_SHOW) {
@@ -52,12 +57,13 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
           dispatch({ type: 'SET_MOVIES', movies: items });
         }
       })
-      .catch(() => {
-        // TODO: Handle errors
+      .catch((error) => {
+        showBoundary(error);
       })
       .finally(() => {
         dispatch({ type: 'SET_LOADING', loading: false });
       });
+  };
 
   const getItemsDataAndClearTimer = (queryType: string): Promise<void> =>
     getItemsData(queryType)
@@ -67,14 +73,14 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
           timer = null;
         }
       })
-      .catch(() => {
-        // TODO: Handle errors
+      .catch((error) => {
+        showBoundary(error);
       });
 
   return (
-    <MoviesShowsContext.Provider value={state}>
-      <MoviesShowsDispatchContext.Provider value={dispatch}>{children}</MoviesShowsDispatchContext.Provider>
-    </MoviesShowsContext.Provider>
+    <MoviesShowsContext value={state}>
+      <MoviesShowsDispatchContext value={dispatch}>{children}</MoviesShowsDispatchContext>
+    </MoviesShowsContext>
   );
 }
 

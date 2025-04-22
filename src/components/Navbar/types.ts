@@ -1,4 +1,4 @@
-export interface INavbar {
+export interface INavbarActiveType {
   moviesActive: boolean;
   showsActive: boolean;
 }
