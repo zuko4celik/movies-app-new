@@ -40,7 +40,7 @@ export default function Navbar(): JSX.Element {
     content ? 'navbar-button-item active' : 'navbar-button-item';
 
   return (
-    <div className='navbar-container'>
+    <div className='navbar-container' role='navigation'>
       <div className='navbar-buttons'>
         <button
           className={setButtonClassName(activeType.showsActive)}
@@ -64,7 +64,7 @@ export default function Navbar(): JSX.Element {
         onChange={onSearchChange}
         aria-label={`Search for ${searchContent}`}
       />
-      <button type='button' id='logout-btn' onClick={handleLogout} aria-label='Logout'>
+      <button type='button' id='logout-btn' onClick={handleLogout} aria-label='Logout' data-testid='logout-btn'>
         <i className='fa fa-sign-out' aria-hidden='true'></i>
       </button>
     </div>

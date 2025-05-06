@@ -5,7 +5,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test",
+    "test": "jest --config jest.config.cjs",
     "eject": "craco eject",
     "format": "prettier --write .",
     "lint": "eslint .",

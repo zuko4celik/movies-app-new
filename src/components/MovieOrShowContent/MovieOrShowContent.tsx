@@ -11,7 +11,7 @@ export default function MovieOrShowContent({ itemPromise }: IMovieOrShowItem): J
 
   // If there is video, display it, otherwise display image
   const displayVideoOrImage =
-    item.videos?.results?.length === 0 ? (
+    !item.videos || item.videos.results?.length === 0 ? (
       <img
         className='item-media picture'
         src={item.posterPath ? `${IMAGE_PATH}${item.posterPath}` : DEFAULT_IMAGE}

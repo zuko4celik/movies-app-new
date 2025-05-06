@@ -20,7 +20,13 @@ export default function Home(): JSX.Element {
   return (
     <>
       <Navbar />
-      {loading ? <Loading /> : <section className='grid-container'>{items}</section>}
+      {loading ? (
+        <Loading />
+      ) : (
+        <section className='grid-container' role='region'>
+          {items}
+        </section>
+      )}
     </>
   );
 }

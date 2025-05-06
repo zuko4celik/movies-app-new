@@ -6,3 +6,12 @@ import '@testing-library/jest-dom';
 
 // TODO: Once the @testing-library/jest-dom lib is bumped to new major version remove line above and uncomment the line below
 // import '@testing-library/jest-dom/jest-globals'
+
+// Added to avoid warnings about React Router v7
+beforeAll(() => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  jest.restoreAllMocks();
+});
