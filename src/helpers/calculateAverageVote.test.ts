@@ -1,7 +1,7 @@
 import { calculateAverageVote } from './';
 
-describe('calculateAverageVote', () => {
-  test('calculate average vote helper', () => {
+describe('calculateAverageVoten helper', () => {
+  test('calculate average vote', () => {
     const actual = calculateAverageVote(5.26);
     const expected = 5.3;
 
