@@ -12,8 +12,13 @@ const formatUrl = (queryType: QueryType, contentType: ContentType, search: strin
   return QUERY_TYPE_INFO[queryType];
 };
 
-const getItems = async (queryType: QueryType, contentType: ContentType, search: string): Promise<IItemsResponse> =>
-  getData<IItemsResponse>(formatUrl(queryType, contentType, search))
+const getItems = async (
+  queryType: QueryType,
+  contentType: ContentType,
+  search: string,
+  signal?: AbortSignal,
+): Promise<IItemsResponse> =>
+  getData<IItemsResponse>(formatUrl(queryType, contentType, search), signal)
     .then((response) => response.data)
     .catch((error) => error);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, createContext, useReducer } from 'react';
+import React, { useEffect, createContext, useReducer, useRef } from 'react';
 import type { Dispatch, JSX } from 'react';
 
 import { useErrorBoundary } from 'react-error-boundary';
@@ -18,6 +18,13 @@ let timer: ReturnType<typeof setTimeout> | null = null;
 function MoviesShowsProvider({ children }: Context): JSX.Element {
   const [state, dispatch] = useReducer(stateReducer, initialState);
   const { showBoundary } = useErrorBoundary();
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     const queryType = state.search.length >= MIN_SEARCH_CHARACTERS ? QUERY_TYPE.SEARCH : QUERY_TYPE.TOP_RATED;
@@ -45,9 +52,13 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
   }, [state.contentType]);
 
   const getItemsData = (queryType: string): Promise<void> => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     dispatch({ type: 'SET_LOADING', loading: true });
 
-    return getItems(queryType as QueryType, state.contentType as ContentType, state.search)
+    return getItems(queryType as QueryType, state.contentType as ContentType, state.search, signal)
       .then(({ results }) => {
         const items = queryType === QUERY_TYPE.TOP_RATED ? results.slice(0, NUMBER_OF_ITEMS) : results;
 
@@ -58,7 +69,9 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
         }
       })
       .catch((error) => {
-        showBoundary(error);
+        if (error.name !== 'AbortError') {
+          showBoundary(error);
+        }
       })
       .finally(() => {
         dispatch({ type: 'SET_LOADING', loading: false });
