@@ -25,7 +25,7 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
     return () => {
       abortControllerRef.current?.abort();
     };
-  }, [userToken]);
+  }, []);
 
   useEffect(() => {
     if (!userToken) return;
@@ -47,14 +47,14 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
     else if (queryType !== state.activeQueryType) {
       getItemsData(queryType);
     }
-  }, [state.search, state.activeQueryType, userToken]);
+  }, [state.search, state.activeQueryType]);
 
   // Triggered on switching between tabs
   useEffect(() => {
     if (!userToken) return;
 
     getItemsData(state.activeQueryType);
-  }, [state.contentType, userToken]);
+  }, [state.contentType]);
 
   const getItemsData = (queryType: string): Promise<void> => {
     abortControllerRef.current?.abort();
