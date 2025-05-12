@@ -19,6 +19,7 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
   const [state, dispatch] = useReducer(stateReducer, initialState);
   const { showBoundary } = useErrorBoundary();
   const abortControllerRef = useRef<AbortController | null>(null);
+  const userToken = sessionStorage.getItem('accessToken');
 
   useEffect(() => {
     return () => {
@@ -27,6 +28,10 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
   }, []);
 
   useEffect(() => {
+    if (!userToken) {
+      return;
+    }
+
     const queryType = state.search.length >= MIN_SEARCH_CHARACTERS ? QUERY_TYPE.SEARCH : QUERY_TYPE.TOP_RATED;
     dispatch({ type: 'SET_ACTIVE_QUERY_TYPE', activeQueryType: queryType });
 
@@ -48,6 +53,10 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
 
   // Triggered on switching between tabs
   useEffect(() => {
+    if (!userToken) {
+      return;
+    }
+
     getItemsData(state.activeQueryType);
   }, [state.contentType]);
 

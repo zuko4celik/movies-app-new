@@ -6,13 +6,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import login from '@/apis/login';
 import { ERROR_CODES, MESSAGES, STATUS_CODES } from '@/constants/constantValues';
 import { loginSchema } from '@/helpers';
-import useLogin from '@/hooks';
+import useAuth from '@/hooks';
 
 import type { IAccountInfo, IUser } from '../types';
 
 export default function Login(): JSX.Element {
   const navigate = useNavigate();
-  const { handleLoginResponse } = useLogin();
+  const { handleLoginResponse } = useAuth();
   const [loginInfo, setLoginInfo] = useState<IAccountInfo>({ code: STATUS_CODES.OK, message: '' });
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
