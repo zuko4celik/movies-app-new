@@ -25,12 +25,10 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
     return () => {
       abortControllerRef.current?.abort();
     };
-  }, []);
+  }, [userToken]);
 
   useEffect(() => {
-    if (!userToken) {
-      return;
-    }
+    if (!userToken) return;
 
     const queryType = state.search.length >= MIN_SEARCH_CHARACTERS ? QUERY_TYPE.SEARCH : QUERY_TYPE.TOP_RATED;
     dispatch({ type: 'SET_ACTIVE_QUERY_TYPE', activeQueryType: queryType });
@@ -49,16 +47,14 @@ function MoviesShowsProvider({ children }: Context): JSX.Element {
     else if (queryType !== state.activeQueryType) {
       getItemsData(queryType);
     }
-  }, [state.search, state.activeQueryType]);
+  }, [state.search, state.activeQueryType, userToken]);
 
   // Triggered on switching between tabs
   useEffect(() => {
-    if (!userToken) {
-      return;
-    }
+    if (!userToken) return;
 
     getItemsData(state.activeQueryType);
-  }, [state.contentType]);
+  }, [state.contentType, userToken]);
 
   const getItemsData = (queryType: string): Promise<void> => {
     abortControllerRef.current?.abort();
